@@ -1,4 +1,4 @@
-import { createClient } from '@supabase/supabase-js';
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.7.1';
 
 export const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -64,8 +64,8 @@ export async function logSystemError(
   severity: ErrorLogEntry['severity'] = 'error'
 ): Promise<void> {
   const supabase = createClient(
-    process.env.SUPABASE_URL!,
-    process.env.SUPABASE_SERVICE_ROLE_KEY!
+    Deno.env.get('SUPABASE_URL')!,
+    Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!
   );
 
   const logEntry: ErrorLogEntry = {
