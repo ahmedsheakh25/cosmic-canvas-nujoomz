@@ -1,11 +1,12 @@
 import React from 'react';
 import { DashboardShell } from '@/layouts/DashboardShell';
-import { SurveyInsightsCard } from '@/features/analytics/SurveyInsightsCard';
-import { ConversationFunnel } from '@/features/analytics/ConversationFunnel';
-import { EmotionTrendGraph } from '@/features/analytics/EmotionTrendGraph';
+import { SurveyInsightsCard } from '@/components/Admin/analytics/SurveyInsightsCard';
+import { ConversationFunnel } from '@/components/Admin/analytics/ConversationFunnel';
+import { EmotionTrendGraph } from '@/components/Admin/analytics/EmotionTrendGraph';
 import { AnalyticsEngine } from '@/core/NujmoozEngine/AnalyticsEngine';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { ElevenLabsTestPanel } from '@/components/Admin/ElevenLabsTestPanel';
 
 export default function Admin() {
   const analyticsEngine = AnalyticsEngine.getInstance();
@@ -26,6 +27,7 @@ export default function Admin() {
             <TabsTrigger value="surveys">Survey Insights</TabsTrigger>
             <TabsTrigger value="emotions">Emotional Analysis</TabsTrigger>
             <TabsTrigger value="funnel">Conversion Funnel</TabsTrigger>
+            <TabsTrigger value="voice">🎤 Voice Testing</TabsTrigger>
           </TabsList>
 
           <TabsContent value="overview" className="space-y-8">
@@ -116,6 +118,12 @@ export default function Admin() {
 
           <TabsContent value="funnel" className="space-y-8">
             <ConversationFunnel />
+          </TabsContent>
+
+          <TabsContent value="voice" className="space-y-8">
+            <div className="grid gap-6">
+              <ElevenLabsTestPanel />
+            </div>
           </TabsContent>
         </Tabs>
       </div>
