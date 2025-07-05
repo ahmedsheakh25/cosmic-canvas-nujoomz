@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { User } from '@supabase/supabase-js';
 import { supabase } from '@/integrations/supabase/client';
@@ -14,7 +13,7 @@ interface DashboardStats {
   activeConversations: number;
 }
 
-export const useAdminDashboard = (user: User) => {
+export const useAdminDashboard = (user: User | null) => {
   const [stats, setStats] = useState<DashboardStats>({
     totalBriefs: 0,
     newBriefs: 0,
@@ -25,11 +24,12 @@ export const useAdminDashboard = (user: User) => {
     totalUsers: 0,
     activeConversations: 0
   });
+  const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   const fetchDashboardStats = async () => {
     try {
-      console.log('Fetching dashboard stats...');
+      setLoading(true);
       setError(null);
       
       // Fetch project briefs with actual database statuses
@@ -61,11 +61,7 @@ export const useAdminDashboard = (user: User) => {
         console.warn('Error fetching conversations:', conversationsError);
       }
 
-      console.log('Fetched briefs:', briefs?.length || 0, 'total briefs');
-      console.log('Available statuses in data:', [...new Set(briefs?.map(b => b.status))]);
-
       const totalBriefs = briefs?.length || 0;
-      // Map actual database statuses correctly
       const newBriefs = briefs?.filter(b => b.status === 'New').length || 0;
       const underReview = briefs?.filter(b => b.status === 'Under Review').length || 0;
       const completed = briefs?.filter(b => b.status === 'Completed').length || 0;
@@ -74,17 +70,6 @@ export const useAdminDashboard = (user: User) => {
       
       const totalUsers = users?.length || 0;
       const activeConversations = new Set(conversations?.map(c => c.session_id)).size || 0;
-
-      console.log('Dashboard stats calculated:', {
-        totalBriefs,
-        newBriefs,
-        underReview,
-        completed,
-        inProgress,
-        needClarification,
-        totalUsers,
-        activeConversations
-      });
 
       setStats({
         totalBriefs,
@@ -100,24 +85,28 @@ export const useAdminDashboard = (user: User) => {
       console.error('Error fetching dashboard stats:', error);
       const errorMessage = error instanceof Error ? error.message : 'Failed to load dashboard statistics';
       setError(errorMessage);
+    } finally {
+      setLoading(false);
     }
   };
 
   useEffect(() => {
     if (!user?.id) {
       console.log('No user provided to dashboard hook');
+      setLoading(false);
       return;
     }
 
     console.log('Initializing dashboard for user:', user.id);
     setError(null);
+    setLoading(true);
     
     fetchDashboardStats();
   }, [user?.id]);
 
   return {
     stats,
-    loading: false,
+    loading,
     fetchDashboardStats,
     error
   };

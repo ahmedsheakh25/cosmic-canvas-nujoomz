@@ -225,7 +225,7 @@ export function DashboardShell({
                 <p className="text-muted-foreground">{description}</p>
               </div>
             </div>
-            <div>{children}</div>
+            <div className="mt-6">{children}</div>
           </div>
         </main>
       </div>

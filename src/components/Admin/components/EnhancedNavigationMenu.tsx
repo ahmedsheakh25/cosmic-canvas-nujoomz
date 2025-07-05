@@ -1,8 +1,9 @@
-
 import React from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion } from 'framer-motion';
+import { useLanguage } from '@/contexts/LanguageContext';
+import { cn } from '@/lib/utils';
 import { Badge } from '@/components/ui/badge';
-import { Sparkles } from 'lucide-react';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { 
   BarChart3, 
   FileText, 
@@ -12,11 +13,63 @@ import {
   Zap, 
   Terminal, 
   Shield, 
-  BookOpen
+  BookOpen,
+  TrendingUp
 } from 'lucide-react';
-import { NavigationSection, SidebarProps } from '../types/NavigationTypes';
 
-interface EnhancedNavigationMenuProps extends SidebarProps {}
+interface NavigationItem {
+  id: string;
+  label: string;
+  icon: React.ElementType;
+  badge: number | null;
+  tourId: string;
+  isNew?: boolean;
+}
+
+interface NavigationSection {
+  title: string;
+  items: NavigationItem[];
+}
+
+interface EnhancedNavigationMenuProps {
+  hasAdminAccess: boolean;
+  hasModeratorAccess: boolean;
+  activeTab: string;
+  onTabChange: (tab: string) => void;
+  stats: {
+    newBriefs: number;
+  };
+}
+
+const menuVariants = {
+  hidden: { opacity: 0, x: -20 },
+  visible: (i: number) => ({
+    opacity: 1,
+    x: 0,
+    transition: {
+      delay: 0.1 * i,
+      duration: 0.3,
+      ease: [0.4, 0, 0.2, 1]
+    }
+  })
+};
+
+const itemVariants = {
+  hidden: { opacity: 0, x: -10 },
+  visible: { 
+    opacity: 1, 
+    x: 0,
+    transition: {
+      duration: 0.2
+    }
+  },
+  hover: { 
+    scale: 1.02,
+    transition: {
+      duration: 0.2
+    }
+  }
+};
 
 const EnhancedNavigationMenu: React.FC<EnhancedNavigationMenuProps> = ({
   hasAdminAccess,
@@ -25,6 +78,8 @@ const EnhancedNavigationMenu: React.FC<EnhancedNavigationMenuProps> = ({
   onTabChange,
   stats
 }) => {
+  const { t } = useLanguage();
+
   const navigationSections: NavigationSection[] = [
     {
       title: "Overview",
@@ -114,97 +169,88 @@ const EnhancedNavigationMenu: React.FC<EnhancedNavigationMenuProps> = ({
   ];
 
   return (
-    <div className="flex-1 overflow-y-auto">
-      {navigationSections.map((section, sectionIndex) => (
-        <motion.div 
-          key={section.title} 
-          className="sidebar-section"
-          initial={{ opacity: 0, x: -20 }}
-          animate={{ opacity: 1, x: 0 }}
-          transition={{ delay: 0.4 + (sectionIndex * 0.1), duration: 0.5 }}
-        >
-          <div className="px-6 py-4">
-            <h3 className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3 flex items-center gap-2">
+    <TooltipProvider>
+      <nav className="flex-1 overflow-y-auto py-6 px-4" role="navigation">
+        {navigationSections.map((section, sectionIndex) => (
+          <motion.div 
+            key={section.title}
+            custom={sectionIndex}
+            initial="hidden"
+            animate="visible"
+            variants={menuVariants}
+            className="mb-8"
+          >
+            <h3 
+              className="px-4 mb-4 text-xs font-semibold text-gray-400 uppercase tracking-wider"
+              id={`nav-section-${section.title.toLowerCase().replace(/\s+/g, '-')}`}
+            >
               {section.title}
-              {section.title === "System" && (
-                <motion.div
-                  animate={{ rotate: 360 }}
-                  transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
-                >
-                  <Sparkles className="w-3 h-3 text-purple-400" />
-                </motion.div>
-              )}
             </h3>
-            <nav className="space-y-1">
-              {section.items.map((item, itemIndex) => (
-                <motion.button
-                  key={item.id}
-                  onClick={() => onTabChange(item.id)}
-                  data-tour={item.tourId}
-                  className={`w-full flex items-center space-x-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all duration-200 group relative ${
-                    activeTab === item.id
-                      ? 'cosmic-gradient text-white shadow-lg'
-                      : 'text-gray-300 hover:bg-white/5 hover:text-white'
-                  }`}
-                  whileHover={{ scale: 1.02, x: 4 }}
-                  whileTap={{ scale: 0.98 }}
-                  initial={{ opacity: 0, x: -10 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ delay: 0.5 + (sectionIndex * 0.1) + (itemIndex * 0.05), duration: 0.3 }}
-                >
-                  <motion.div
-                    whileHover={{ rotate: activeTab === item.id ? 0 : 10 }}
-                    transition={{ duration: 0.2 }}
-                  >
-                    <item.icon className={`w-5 h-5 ${
-                      activeTab === item.id ? 'text-white' : 'text-gray-400 group-hover:text-white'
-                    }`} />
-                  </motion.div>
-                  <span className="flex-1 text-left truncate">{item.label}</span>
-                  
-                  {/* Enhanced badges and indicators */}
-                  <div className="flex items-center gap-1">
-                    {item.isNew && (
-                      <motion.div
-                        className="px-1.5 py-0.5 bg-gradient-to-r from-pink-500 to-purple-500 rounded-full text-xs font-bold text-white"
-                        initial={{ scale: 0 }}
-                        animate={{ scale: 1 }}
-                        transition={{ delay: 1, type: "spring", stiffness: 500 }}
+            
+            <div 
+              role="group" 
+              aria-labelledby={`nav-section-${section.title.toLowerCase().replace(/\s+/g, '-')}`}
+              className="space-y-1"
+            >
+              {section.items.map((item) => {
+                const isActive = activeTab === item.id;
+                
+                return (
+                  <Tooltip key={item.id}>
+                    <TooltipTrigger asChild>
+                      <motion.button
+                        onClick={() => onTabChange(item.id)}
+                        className={cn(
+                          'w-full flex items-center px-4 py-3 text-sm rounded-lg transition-colors',
+                          'focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500',
+                          isActive
+                            ? 'bg-green-50 text-green-700 font-medium'
+                            : 'text-gray-600 hover:bg-gray-50'
+                        )}
+                        variants={itemVariants}
+                        whileHover="hover"
+                        role="menuitem"
+                        aria-current={isActive ? 'page' : undefined}
                       >
-                        NEW
-                      </motion.div>
-                    )}
-                    {item.badge && (
-                      <motion.div
-                        className="bg-red-500 text-white text-xs px-2 py-0.5 rounded-full"
-                        initial={{ scale: 0 }}
-                        animate={{ scale: 1 }}
-                        transition={{ delay: 0.8, type: "spring", stiffness: 300 }}
-                      >
-                        {item.badge}
-                      </motion.div>
-                    )}
-                  </div>
-
-                  {/* Active indicator */}
-                  <AnimatePresence>
-                    {activeTab === item.id && (
-                      <motion.div
-                        className="absolute right-0 top-1/2 transform -translate-y-1/2 w-1 h-8 bg-white rounded-l-full"
-                        initial={{ scaleY: 0 }}
-                        animate={{ scaleY: 1 }}
-                        exit={{ scaleY: 0 }}
-                        transition={{ duration: 0.2 }}
-                      />
-                    )}
-                  </AnimatePresence>
-                </motion.button>
-              ))}
-            </nav>
-          </div>
-        </motion.div>
-      ))}
-    </div>
+                        <item.icon className={cn(
+                          'flex-shrink-0 w-5 h-5 mr-3',
+                          isActive ? 'text-green-600' : 'text-gray-400'
+                        )} />
+                        
+                        <span className="flex-1 text-left">
+                          {item.label}
+                        </span>
+                        
+                        {item.badge && (
+                          <Badge 
+                            variant="default" 
+                            className="ml-2 bg-green-100 text-green-700"
+                          >
+                            {item.badge}
+                          </Badge>
+                        )}
+                        
+                        {item.isNew && (
+                          <Badge 
+                            variant="default" 
+                            className="ml-2 bg-blue-100 text-blue-700"
+                          >
+                            New
+                          </Badge>
+                        )}
+                      </motion.button>
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      <p>{t(`tooltips.${item.tourId}`) || item.label}</p>
+                    </TooltipContent>
+                  </Tooltip>
+                );
+              })}
+            </div>
+          </motion.div>
+        ))}
+      </nav>
+    </TooltipProvider>
   );
 };
 

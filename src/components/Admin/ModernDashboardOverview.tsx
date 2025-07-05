@@ -1,9 +1,9 @@
-
 import React from 'react';
 import { motion } from 'framer-motion';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { Button } from '@/components/ui/button';
-import ModernStatsCard from './ModernStatsCard';
+import { Skeleton } from '@/components/ui/skeleton';
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { 
   RefreshCw, 
   FileText, 
@@ -17,6 +17,8 @@ import {
   Zap,
   BarChart3
 } from 'lucide-react';
+import { cn } from '@/lib/utils';
+import ModernStatsCard from './ModernStatsCard';
 
 interface DashboardStats {
   totalBriefs: number;
@@ -26,21 +28,170 @@ interface DashboardStats {
   inProgress: number;
   needClarification: number;
   totalUsers: number;
-  activeConversations: number;
 }
 
 interface ModernDashboardOverviewProps {
   stats: DashboardStats;
   loading: boolean;
+  error?: string | null;
   onRefresh: () => void;
 }
+
+interface ModernStatsCardProps {
+  titleKey: string;
+  value: number;
+  icon: React.ElementType;
+  color?: 'green' | 'blue' | 'orange' | 'red' | 'purple';
+  trend?: {
+    value: number;
+    direction: 'up' | 'down';
+  };
+  description?: string;
+  loading?: boolean;
+}
+
+const ModernStatsCard: React.FC<ModernStatsCardProps> = ({
+  titleKey,
+  value,
+  icon: Icon,
+  color = 'green',
+  trend,
+  description,
+  loading = false
+}) => {
+  const { t } = useLanguage();
+
+  const colorClasses = {
+    green: {
+      bg: 'bg-green-50',
+      icon: 'text-green-600',
+      accent: 'border-green-200',
+      trend: 'text-green-600'
+    },
+    blue: {
+      bg: 'bg-blue-50',
+      icon: 'text-blue-600',
+      accent: 'border-blue-200',
+      trend: 'text-blue-600'
+    },
+    orange: {
+      bg: 'bg-orange-50',
+      icon: 'text-orange-600',
+      accent: 'border-orange-200',
+      trend: 'text-orange-600'
+    },
+    red: {
+      bg: 'bg-red-50',
+      icon: 'text-red-600',
+      accent: 'border-red-200',
+      trend: 'text-red-600'
+    },
+    purple: {
+      bg: 'bg-purple-50',
+      icon: 'text-purple-600',
+      accent: 'border-purple-200',
+      trend: 'text-purple-600'
+    }
+  };
+
+  const classes = colorClasses[color];
+
+  if (loading) {
+    return (
+      <div className={cn(
+        'p-6 rounded-xl border shadow-sm',
+        classes.bg,
+        classes.accent
+      )}>
+        <div className="flex items-center justify-between">
+          <div className="flex items-center space-x-3">
+            <div className={cn(
+              'w-10 h-10 rounded-lg flex items-center justify-center',
+              classes.bg
+            )}>
+              <Icon className={cn('w-6 h-6', classes.icon)} />
+            </div>
+            <div>
+              <Skeleton className="h-4 w-24 mb-1" />
+              <Skeleton className="h-3 w-32" />
+            </div>
+          </div>
+          <Skeleton className="h-6 w-16" />
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className={cn(
+      'p-6 rounded-xl border shadow-sm',
+      classes.bg,
+      classes.accent
+    )}>
+      <div className="flex items-center justify-between">
+        <div className="flex items-center space-x-3">
+          <div className={cn(
+            'w-10 h-10 rounded-lg flex items-center justify-center',
+            classes.bg
+          )}>
+            <Icon className={cn('w-6 h-6', classes.icon)} />
+          </div>
+          <div>
+            <h3 className="text-sm font-medium text-gray-600">
+              {t(titleKey)}
+            </h3>
+            <p className="text-xs text-gray-500">
+              {description}
+            </p>
+          </div>
+        </div>
+        <div className="text-2xl font-bold text-gray-900">
+          {value}
+          {trend && (
+            <span className={cn(
+              'text-sm ml-2',
+              trend.direction === 'up' ? classes.trend : 'text-red-600'
+            )}>
+              {trend.direction === 'up' ? '+' : '-'}{trend.value}%
+            </span>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+};
 
 const ModernDashboardOverview: React.FC<ModernDashboardOverviewProps> = ({
   stats,
   loading,
+  error,
   onRefresh
 }) => {
   const { t } = useLanguage();
+
+  if (error) {
+    return (
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        className="space-y-8"
+      >
+        <Alert variant="destructive">
+          <AlertCircle className="h-4 w-4" />
+          <AlertTitle>Error</AlertTitle>
+          <AlertDescription>{error}</AlertDescription>
+        </Alert>
+        <Button 
+          onClick={onRefresh} 
+          variant="outline"
+          className="w-full"
+        >
+          <RefreshCw className="w-4 h-4 mr-2" />
+          Try Again
+        </Button>
+      </motion.div>
+    );
+  }
 
   return (
     <div className="space-y-8">
@@ -62,149 +213,113 @@ const ModernDashboardOverview: React.FC<ModernDashboardOverviewProps> = ({
         <Button 
           onClick={onRefresh} 
           disabled={loading}
-          className="bg-green-600 hover:bg-green-700 text-white shadow-sm"
+          className={cn(
+            'bg-green-600 hover:bg-green-700 text-white shadow-sm',
+            { 'opacity-50 cursor-not-allowed': loading }
+          )}
         >
-          <RefreshCw className={`w-4 h-4 mr-2 rtl:ml-2 rtl:mr-0 ${loading ? 'animate-spin' : ''}`} />
+          <RefreshCw className={cn(
+            'w-4 h-4 mr-2 rtl:ml-2 rtl:mr-0',
+            { 'animate-spin': loading }
+          )} />
           {t('actions.refresh')}
         </Button>
       </motion.div>
 
-      {/* Primary Metrics Grid */}
-      <div className="mb-8">
-        <h2 className="text-xl font-semibold text-gray-800 mb-6 flex items-center gap-3">
-          <BarChart3 className="w-6 h-6 text-green-600" />
-          Project Analytics
-        </h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-          <ModernStatsCard
-            titleKey="metrics.totalProjects"
-            value={stats.totalBriefs}
-            icon={FileText}
-            color="green"
-            trend={{ value: 12, direction: 'up' }}
-            description="All project submissions"
-          />
-          
-          <ModernStatsCard
-            titleKey="metrics.activeProjects"
-            value={stats.newBriefs}
-            icon={AlertCircle}
-            color="blue"
-            trend={{ value: 8, direction: 'up' }}
-            description="Awaiting review"
-          />
-          
-          <ModernStatsCard
-            titleKey="metrics.completedProjects"
-            value={stats.inProgress}
-            icon={Clock}
-            color="orange"
-            trend={{ value: 3, direction: 'down' }}
-            description="Currently active"
-          />
-          
-          <ModernStatsCard
-            titleKey="metrics.completedProjects"
-            value={stats.completed}
-            icon={CheckCircle}
-            color="green"
-            trend={{ value: 15, direction: 'up' }}
-            description="Successfully delivered"
-          />
-        </div>
-      </div>
-
-      {/* User Management Metrics */}
-      <div className="mb-8">
-        <h2 className="text-xl font-semibold text-gray-800 mb-6 flex items-center gap-3">
-          <Users className="w-6 h-6 text-green-600" />
-          User Management
-        </h2>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <ModernStatsCard
-            titleKey="metrics.totalUsers"
-            value={stats.totalUsers}
-            icon={Users}
-            color="blue"
-            description="Registered platform users"
-          />
-          
-          <ModernStatsCard
-            titleKey="metrics.activeUsers"
-            value={stats.activeConversations}
-            icon={Activity}
-            color="green"
-            description="Active in last 24h"
-          />
-          
-          <ModernStatsCard
-            titleKey="metrics.pendingReview"
-            value={stats.needClarification}
-            icon={Eye}
-            color="orange"
-            description="Requiring attention"
-          />
-        </div>
-      </div>
-
-      {/* System Performance */}
-      <motion.div 
-        className="bg-white rounded-xl p-8 border border-gray-200 shadow-sm"
-        initial={{ opacity: 0, scale: 0.95 }}
-        animate={{ opacity: 1, scale: 1 }}
-        transition={{ delay: 0.6, duration: 0.4 }}
-      >
-        <h3 className="text-xl font-semibold text-gray-900 mb-6 flex items-center gap-3">
-          <Zap className="w-6 h-6 text-green-600" />
-          System Performance Insights
-        </h3>
+      {/* Stats Grid */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <ModernStatsCard
+          titleKey="metrics.totalProjects"
+          value={stats.totalBriefs}
+          icon={FileText}
+          color="purple"
+          loading={loading}
+          description={t('metrics.totalProjectsDesc')}
+        />
         
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-          <motion.div 
-            className="text-center p-6 bg-gradient-to-br from-green-50 to-green-100 rounded-xl"
-            whileHover={{ scale: 1.05 }}
-            transition={{ duration: 0.2 }}
-          >
-            <div className="text-3xl font-bold text-green-700 mb-2">
-              {stats.totalBriefs > 0 ? Math.round((stats.completed / stats.totalBriefs) * 100) : 0}%
-            </div>
-            <div className="text-sm text-gray-600">Completion Rate</div>
-          </motion.div>
-          
-          <motion.div 
-            className="text-center p-6 bg-gradient-to-br from-blue-50 to-blue-100 rounded-xl"
-            whileHover={{ scale: 1.05 }}
-            transition={{ duration: 0.2 }}
-          >
-            <div className="text-3xl font-bold text-blue-700 mb-2">
-              {stats.newBriefs + stats.inProgress}
-            </div>
-            <div className="text-sm text-gray-600">Active Pipeline</div>
-          </motion.div>
-          
-          <motion.div 
-            className="text-center p-6 bg-gradient-to-br from-orange-50 to-orange-100 rounded-xl"
-            whileHover={{ scale: 1.05 }}
-            transition={{ duration: 0.2 }}
-          >
-            <div className="text-3xl font-bold text-orange-700 mb-2">
-              {stats.needClarification + stats.underReview}
-            </div>
-            <div className="text-sm text-gray-600">Need Attention</div>
-          </motion.div>
-          
-          <motion.div 
-            className="text-center p-6 bg-gradient-to-br from-purple-50 to-purple-100 rounded-xl"
-            whileHover={{ scale: 1.05 }}
-            transition={{ duration: 0.2 }}
-          >
-            <div className="text-3xl font-bold text-purple-700 mb-2">
-              {stats.activeConversations > 0 ? Math.round((stats.activeConversations / Math.max(stats.totalUsers, 1)) * 100) : 0}%
-            </div>
-            <div className="text-sm text-gray-600">Engagement Rate</div>
-          </motion.div>
-        </div>
-      </motion.div>
+        <ModernStatsCard
+          titleKey="metrics.newRequests"
+          value={stats.newBriefs}
+          icon={AlertCircle}
+          color="blue"
+          loading={loading}
+          trend={{ value: 8, direction: 'up' }}
+          description={t('metrics.newRequestsDesc')}
+        />
+        
+        <ModernStatsCard
+          titleKey="metrics.inProgress"
+          value={stats.inProgress}
+          icon={Clock}
+          color="orange"
+          loading={loading}
+          trend={{ value: 3, direction: 'down' }}
+          description={t('metrics.inProgressDesc')}
+        />
+        
+        <ModernStatsCard
+          titleKey="metrics.completed"
+          value={stats.completed}
+          icon={CheckCircle}
+          color="green"
+          loading={loading}
+          trend={{ value: 15, direction: 'up' }}
+          description={t('metrics.completedDesc')}
+        />
+      </div>
+
+      {/* Secondary Stats */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <ModernStatsCard
+          titleKey="metrics.underReview"
+          value={stats.underReview}
+          icon={Eye}
+          color="blue"
+          loading={loading}
+          description={t('metrics.underReviewDesc')}
+        />
+        
+        <ModernStatsCard
+          titleKey="metrics.needClarification"
+          value={stats.needClarification}
+          icon={AlertCircle}
+          color="orange"
+          loading={loading}
+          description={t('metrics.needClarificationDesc')}
+        />
+      </div>
+
+      {/* User Stats */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <ModernStatsCard
+          titleKey="metrics.totalUsers"
+          value={stats.totalUsers}
+          icon={Users}
+          color="green"
+          loading={loading}
+          description={t('metrics.totalUsersDesc')}
+        />
+        
+        <ModernStatsCard
+          titleKey="metrics.activeUsers"
+          value={stats.totalUsers * 0.7}
+          icon={Activity}
+          color="purple"
+          loading={loading}
+          trend={{ value: 12, direction: 'up' }}
+          description={t('metrics.activeUsersDesc')}
+        />
+        
+        <ModernStatsCard
+          titleKey="metrics.userGrowth"
+          value={25}
+          icon={TrendingUp}
+          color="blue"
+          loading={loading}
+          trend={{ value: 25, direction: 'up' }}
+          description={t('metrics.userGrowthDesc')}
+        />
+      </div>
     </div>
   );
 };

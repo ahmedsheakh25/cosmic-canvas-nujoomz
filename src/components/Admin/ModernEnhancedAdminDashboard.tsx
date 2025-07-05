@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { User } from '@supabase/supabase-js';
 import { motion } from 'framer-motion';
@@ -17,6 +16,8 @@ import FeatureManagement from './FeatureManagement';
 import KnowledgeBaseManagement from './KnowledgeBaseManagement';
 import IntegratedDeveloperTools from './IntegratedDeveloperTools';
 import ActivityLog from './ActivityLog';
+import ErrorBoundary from './ErrorBoundary';
+import LoadingState from './LoadingState';
 
 interface ModernEnhancedAdminDashboardProps {
   user: User;
@@ -32,12 +33,16 @@ const ModernEnhancedAdminDashboard: React.FC<ModernEnhancedAdminDashboardProps> 
   const {
     userRole,
     hasAdminAccess,
-    hasModeratorAccess
+    hasModeratorAccess,
+    loading: authLoading,
+    error: authError
   } = useAdminAuth();
 
   const {
     stats,
-    fetchDashboardStats
+    loading: statsLoading,
+    fetchDashboardStats,
+    error: statsError
   } = useAdminDashboard(user);
 
   const handleRefresh = async () => {
@@ -49,12 +54,23 @@ const ModernEnhancedAdminDashboard: React.FC<ModernEnhancedAdminDashboardProps> 
   };
 
   const renderTabContent = () => {
+    // Show loading state while auth is loading
+    if (authLoading) {
+      return <LoadingState message="Loading user permissions..." />;
+    }
+
+    // Show error state if auth failed
+    if (authError) {
+      throw new Error(authError);
+    }
+
     switch (activeTab) {
       case 'overview':
         return (
           <ModernDashboardOverview 
             stats={stats}
-            loading={false}
+            loading={statsLoading}
+            error={statsError}
             onRefresh={handleRefresh}
           />
         );
@@ -93,7 +109,8 @@ const ModernEnhancedAdminDashboard: React.FC<ModernEnhancedAdminDashboardProps> 
         return (
           <ModernDashboardOverview 
             stats={stats}
-            loading={false}
+            loading={statsLoading}
+            error={statsError}
             onRefresh={handleRefresh}
           />
         );
@@ -101,47 +118,53 @@ const ModernEnhancedAdminDashboard: React.FC<ModernEnhancedAdminDashboardProps> 
   };
 
   return (
-    <LanguageProvider>
-      <motion.div 
-        className="min-h-screen bg-gray-50 flex w-full"
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ duration: 0.5 }}
-      >
-        {/* Modern Sidebar */}
-        <ModernAdminSidebar
-          hasAdminAccess={hasAdminAccess}
-          hasModeratorAccess={hasModeratorAccess}
-          activeTab={activeTab}
-          onTabChange={setActiveTab}
-          stats={stats}
-        />
-
-        {/* Main Content Area */}
-        <div className="flex-1 flex flex-col">
-          {/* Modern Header */}
-          <ModernAdminHeader
-            user={user}
-            userRole={userRole}
-            onSignOut={onSignOut}
-            onRefresh={handleRefresh}
+    <ErrorBoundary>
+      <LanguageProvider>
+        <motion.div 
+          className="min-h-screen bg-gray-50 flex w-full"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.5 }}
+        >
+          {/* Modern Sidebar */}
+          <ModernAdminSidebar
+            hasAdminAccess={hasAdminAccess}
+            hasModeratorAccess={hasModeratorAccess}
+            activeTab={activeTab}
+            onTabChange={setActiveTab}
+            stats={stats}
+            loading={statsLoading}
           />
 
-          {/* Content Area */}
-          <main className="flex-1 p-8 overflow-y-auto">
-            <motion.div
-              key={activeTab}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -20 }}
-              transition={{ duration: 0.3 }}
-            >
-              {renderTabContent()}
-            </motion.div>
-          </main>
-        </div>
-      </motion.div>
-    </LanguageProvider>
+          {/* Main Content Area */}
+          <div className="flex-1 flex flex-col">
+            {/* Modern Header */}
+            <ModernAdminHeader
+              user={user}
+              userRole={userRole}
+              activeTab={activeTab}
+              onRefresh={handleRefresh}
+              onSignOut={onSignOut}
+              loading={statsLoading}
+              error={statsError}
+            />
+
+            {/* Content Area */}
+            <main className="flex-1 p-8 overflow-y-auto">
+              <motion.div
+                key={activeTab}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -20 }}
+                transition={{ duration: 0.3 }}
+              >
+                {renderTabContent()}
+              </motion.div>
+            </main>
+          </div>
+        </motion.div>
+      </LanguageProvider>
+    </ErrorBoundary>
   );
 };
 

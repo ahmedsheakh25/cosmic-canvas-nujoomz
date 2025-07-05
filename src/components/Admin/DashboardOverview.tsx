@@ -1,8 +1,8 @@
-
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { RefreshCw, FileText, Clock, CheckCircle, AlertCircle, Users, TrendingUp } from 'lucide-react';
 import CosmicStatsCard from './CosmicStatsCard';
+import { Skeleton } from '@/components/ui/skeleton';
 
 interface DashboardStats {
   totalBriefs: number;
@@ -20,6 +20,45 @@ interface DashboardOverviewProps {
 }
 
 const DashboardOverview: React.FC<DashboardOverviewProps> = ({ stats, loading, onRefresh }) => {
+  if (loading) {
+    return (
+      <div className="space-y-8 fade-in-up">
+        {/* Header */}
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+          <div>
+            <Skeleton className="h-10 w-64 mb-2" />
+            <Skeleton className="h-6 w-96" />
+          </div>
+          <Skeleton className="h-10 w-32" />
+        </div>
+
+        {/* Main Stats Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+          {Array(4).fill(0).map((_, i) => (
+            <Skeleton key={i} className="h-40" />
+          ))}
+        </div>
+
+        {/* Secondary Stats */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          {Array(2).fill(0).map((_, i) => (
+            <Skeleton key={i} className="h-40" />
+          ))}
+        </div>
+
+        {/* Quick Insights */}
+        <div className="dashboard-card rounded-xl p-6">
+          <Skeleton className="h-8 w-48 mb-4" />
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            {Array(3).fill(0).map((_, i) => (
+              <Skeleton key={i} className="h-24" />
+            ))}
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="space-y-8 fade-in-up">
       {/* Header */}

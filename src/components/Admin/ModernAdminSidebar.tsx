@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { motion } from 'framer-motion';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -18,11 +17,13 @@ import {
   Eye,
   UserCheck
 } from 'lucide-react';
+import { cn } from '@/lib/utils';
+import { Skeleton } from '@/components/ui/skeleton';
 
 interface NavigationItem {
   id: string;
   labelKey: string;
-  icon: React.ComponentType<any>;
+  icon: React.ElementType;
   badge?: number;
   isNew?: boolean;
 }
@@ -40,6 +41,7 @@ interface ModernAdminSidebarProps {
   stats: {
     newBriefs: number;
   };
+  loading?: boolean;
 }
 
 const ModernAdminSidebar: React.FC<ModernAdminSidebarProps> = ({
@@ -47,7 +49,8 @@ const ModernAdminSidebar: React.FC<ModernAdminSidebarProps> = ({
   hasModeratorAccess,
   activeTab,
   onTabChange,
-  stats
+  stats,
+  loading = false
 }) => {
   const { t, direction } = useLanguage();
 
@@ -132,6 +135,32 @@ const ModernAdminSidebar: React.FC<ModernAdminSidebarProps> = ({
     }
   ];
 
+  if (loading) {
+    return (
+      <div className="w-64 h-screen bg-white border-r border-gray-200 p-4 space-y-8">
+        {/* Header */}
+        <div className="space-y-4">
+          <Skeleton className="h-8 w-32" />
+          <Skeleton className="h-4 w-48" />
+        </div>
+
+        {/* Navigation Sections */}
+        <div className="space-y-8">
+          {Array(4).fill(0).map((_, sectionIndex) => (
+            <div key={sectionIndex} className="space-y-4">
+              <Skeleton className="h-4 w-24" />
+              <div className="space-y-2">
+                {Array(3).fill(0).map((_, itemIndex) => (
+                  <Skeleton key={itemIndex} className="h-10 w-full" />
+                ))}
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    );
+  }
+
   return (
     <motion.div 
       className="w-72 h-screen bg-white border-r border-gray-200 flex flex-col shadow-sm sticky top-0"
@@ -177,57 +206,4 @@ const ModernAdminSidebar: React.FC<ModernAdminSidebarProps> = ({
                 <motion.button
                   key={item.id}
                   onClick={() => onTabChange(item.id)}
-                  className={`w-full flex items-center space-x-3 rtl:space-x-reverse px-3 py-3 rounded-lg text-sm font-medium transition-all duration-200 group ${
-                    activeTab === item.id
-                      ? 'bg-green-50 text-green-700 border-r-2 rtl:border-l-2 rtl:border-r-0 border-green-500'
-                      : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
-                  }`}
-                  whileHover={{ scale: 1.02, x: direction === 'rtl' ? -4 : 4 }}
-                  whileTap={{ scale: 0.98 }}
-                  initial={{ opacity: 0, x: direction === 'rtl' ? 10 : -10 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ delay: 0.05 * itemIndex, duration: 0.2 }}
-                >
-                  <item.icon className={`w-5 h-5 ${
-                    activeTab === item.id ? 'text-green-600' : 'text-gray-400 group-hover:text-gray-600'
-                  }`} />
-                  <span className="flex-1 text-left rtl:text-right truncate">
-                    {t(item.labelKey) || item.labelKey}
-                  </span>
-                  
-                  {/* Badges and indicators */}
-                  <div className="flex items-center gap-1">
-                    {item.isNew && (
-                      <Badge className="bg-green-500 text-white text-xs px-1.5 py-0.5">
-                        NEW
-                      </Badge>
-                    )}
-                    {item.badge && (
-                      <Badge className="bg-red-500 text-white text-xs px-1.5 py-0.5">
-                        {item.badge}
-                      </Badge>
-                    )}
-                  </div>
-                </motion.button>
-              ))}
-            </nav>
-          </motion.div>
-        ))}
-      </div>
-
-      {/* Footer */}
-      <div className="p-6 border-t border-gray-200">
-        <div className="text-center">
-          <div className="text-sm font-medium text-green-600 mb-1">
-            OfSpace Studio v2.0
-          </div>
-          <p className="text-xs text-gray-400">
-            Enhanced Admin Panel
-          </p>
-        </div>
-      </div>
-    </motion.div>
-  );
-};
-
-export default ModernAdminSidebar;
+                  className={`

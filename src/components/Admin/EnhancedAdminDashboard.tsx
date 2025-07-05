@@ -1,32 +1,43 @@
-
 import React, { useState } from 'react';
 import { User } from '@supabase/supabase-js';
+import { motion } from 'framer-motion';
 import { useAdminDashboard } from '@/hooks/useAdminDashboard';
 import { useAdminAuth } from '@/hooks/useAdminAuth';
+import { LanguageProvider } from '@/contexts/LanguageContext';
 import { toast } from 'sonner';
-import { motion } from 'framer-motion';
-import EnhancedCosmicAdminSidebar from './EnhancedCosmicAdminSidebar';
-import CosmicMainContent from './CosmicMainContent';
-import EnhancedAdminTabsContent from './EnhancedAdminTabsContent';
-import { adminAnimations } from './animations/AdminAnimations';
+import ModernAdminHeader from './ModernAdminHeader';
+import ModernAdminSidebar from './ModernAdminSidebar';
+import ModernDashboardOverview from './ModernDashboardOverview';
+import EnhancedProjectBriefsTable from './EnhancedProjectBriefsTable';
+import RealTimeAnalytics from './RealTimeAnalytics';
+import TeamManagement from './TeamManagement';
+import RoleManagement from './RoleManagement';
+import FeatureManagement from './FeatureManagement';
+import KnowledgeBaseManagement from './KnowledgeBaseManagement';
+import IntegratedDeveloperTools from './IntegratedDeveloperTools';
+import ActivityLog from './ActivityLog';
 
-interface EnhancedAdminDashboardProps {
+interface ModernEnhancedAdminDashboardProps {
   user: User;
   onSignOut: () => void;
 }
 
-const EnhancedAdminDashboard: React.FC<EnhancedAdminDashboardProps> = ({ user, onSignOut }) => {
+const ModernEnhancedAdminDashboard: React.FC<ModernEnhancedAdminDashboardProps> = ({ 
+  user, 
+  onSignOut 
+}) => {
   const [activeTab, setActiveTab] = useState('overview');
-  
+
   const {
     userRole,
     hasAdminAccess,
     hasModeratorAccess,
-    error: authError
+    loading: authLoading
   } = useAdminAuth();
 
   const {
     stats,
+    loading: statsLoading,
     fetchDashboardStats,
     error: statsError
   } = useAdminDashboard(user);
@@ -34,12 +45,63 @@ const EnhancedAdminDashboard: React.FC<EnhancedAdminDashboardProps> = ({ user, o
   const handleRefresh = async () => {
     toast.promise(fetchDashboardStats(), {
       loading: 'Refreshing dashboard data...',
-      success: 'Dashboard data updated successfully!',
-      error: 'Failed to refresh dashboard data'
+      success: 'Dashboard updated successfully!',
+      error: 'Failed to refresh data'
     });
   };
 
-  // TEMPORARY: Skip error state check - all authenticated users have access
+  const renderTabContent = () => {
+    switch (activeTab) {
+      case 'overview':
+        return (
+          <ModernDashboardOverview 
+            stats={stats}
+            loading={statsLoading}
+            onRefresh={handleRefresh}
+          />
+        );
+
+      case 'briefs':
+        return <EnhancedProjectBriefsTable onStatsUpdate={fetchDashboardStats} />;
+
+      case 'analytics':
+        return <RealTimeAnalytics />;
+
+      case 'team':
+        return <TeamManagement />;
+
+      case 'users':
+        return <TeamManagement />;
+
+      case 'roles':
+        return hasAdminAccess ? <RoleManagement /> : null;
+
+      case 'features':
+        return <FeatureManagement />;
+
+      case 'knowledge':
+        return hasModeratorAccess ? <KnowledgeBaseManagement /> : null;
+
+      case 'developer':
+        return <IntegratedDeveloperTools />;
+
+      case 'activity':
+        return <ActivityLog />;
+
+      case 'monitoring':
+        return <RealTimeAnalytics />;
+
+      default:
+        return (
+          <ModernDashboardOverview 
+            stats={stats}
+            loading={statsLoading}
+            onRefresh={handleRefresh}
+          />
+        );
+    }
+  };
+
   return (
     <motion.div 
       className="min-h-screen bg-gray-50 flex w-full"
@@ -48,14 +110,13 @@ const EnhancedAdminDashboard: React.FC<EnhancedAdminDashboardProps> = ({ user, o
       transition={{ duration: 0.5 }}
     >
       {/* Enhanced Sidebar */}
-      <EnhancedCosmicAdminSidebar
-        user={user}
-        userRole={userRole}
+      <ModernAdminSidebar
         hasAdminAccess={hasAdminAccess}
         hasModeratorAccess={hasModeratorAccess}
         activeTab={activeTab}
         onTabChange={setActiveTab}
         stats={stats}
+        loading={statsLoading}
       />
 
       {/* Main Content with animations */}
@@ -65,25 +126,21 @@ const EnhancedAdminDashboard: React.FC<EnhancedAdminDashboardProps> = ({ user, o
         animate={{ opacity: 1, x: 0 }}
         transition={{ delay: 0.3, duration: 0.5 }}
       >
-        <CosmicMainContent
+        <ModernAdminHeader
           user={user}
           userRole={userRole}
           activeTab={activeTab}
           onRefresh={handleRefresh}
           onSignOut={onSignOut}
-        >
-          <EnhancedAdminTabsContent 
-            stats={stats}
-            loading={false}
-            hasAdminAccess={hasAdminAccess}
-            hasModeratorAccess={hasModeratorAccess}
-            onRefresh={fetchDashboardStats}
-            activeTab={activeTab}
-          />
-        </CosmicMainContent>
+          loading={statsLoading}
+          error={statsError}
+        />
+        <div className="p-6">
+          {renderTabContent()}
+        </div>
       </motion.div>
     </motion.div>
   );
 };
 
-export default EnhancedAdminDashboard;
+export default ModernEnhancedAdminDashboard;
