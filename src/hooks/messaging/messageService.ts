@@ -34,4 +34,5 @@ export const processAIResponse = async (
     await saveChatMessage(sessionId, data.response, 'nujmooz', language);
   }
 
- 
+  return { data };
+};

@@ -75,7 +75,7 @@ export class PromptManager {
       id: 'discovery',
       type: 'general',
       content: {
-        en: 'I understand you're interested in {{service}}. Could you tell me more about your project?',
+        en: 'I understand you\'re interested in {{service}}. Could you tell me more about your project?',
         ar: 'فهمت إنك مهتم بـ {{service}}. ممكن تخبرني أكثر عن مشروعك؟'
       },
       variables: ['service'],
@@ -189,7 +189,7 @@ export class PromptManager {
   private addEnthusiasm(content: string, language: 'en' | 'ar'): string {
     const enthusiasm = language === 'ar'
       ? 'رائع! أنا متحمس لمساعدتك في تحقيق هدفك.'
-      : 'That's exciting! I'm thrilled to help you achieve your goal.';
+      : 'That\'s exciting! I\'m thrilled to help you achieve your goal.';
     
     return `${enthusiasm}\n\n${content}`;
   }

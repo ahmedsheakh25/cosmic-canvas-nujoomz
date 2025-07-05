@@ -1,3 +1,12 @@
+export interface ServiceConfig {
+  name: string;
+  isConfigured: boolean;
+  isCritical: boolean;
+  status: 'healthy' | 'error' | 'unknown' | 'not_configured';
+  lastCheck?: Date;
+  error?: string;
+}
+
 interface Environment {
   supabase: {
     url: string;
@@ -119,7 +128,7 @@ export class EnvironmentConfig {
         const message = `Missing environment variable: ${key}`;
         if (criticalVars.includes(key)) {
           console.error(`🚨 CRITICAL: ${message}`);
-          throw new Error(`Critical environment variable missing: ${key}`);
+          // Don't throw for missing critical services - just log the error
         } else {
           console.warn(`⚠️ WARNING: ${message}`);
         }
@@ -127,6 +136,59 @@ export class EnvironmentConfig {
     });
 
     return missingVars;
+  }
+
+  public getServiceConfigs(): ServiceConfig[] {
+    return [
+      {
+        name: 'supabase',
+        isConfigured: this.isServiceConfigured('supabase'),
+        isCritical: true,
+        status: this.isServiceConfigured('supabase') ? 'unknown' : 'not_configured'
+      },
+      {
+        name: 'openai',
+        isConfigured: this.isServiceConfigured('openai'),
+        isCritical: true,
+        status: this.isServiceConfigured('openai') ? 'unknown' : 'not_configured'
+      },
+      {
+        name: 'elevenLabs',
+        isConfigured: this.isServiceConfigured('elevenLabs'),
+        isCritical: false,
+        status: this.isServiceConfigured('elevenLabs') ? 'unknown' : 'not_configured'
+      },
+      {
+        name: 'colorServices',
+        isConfigured: this.isServiceConfigured('colorServices'),
+        isCritical: false,
+        status: this.isServiceConfigured('colorServices') ? 'unknown' : 'not_configured'
+      },
+      {
+        name: 'analytics',
+        isConfigured: this.isServiceConfigured('analytics'),
+        isCritical: false,
+        status: this.isServiceConfigured('analytics') ? 'unknown' : 'not_configured'
+      },
+      {
+        name: 'surveysparrow',
+        isConfigured: this.isServiceConfigured('surveysparrow'),
+        isCritical: false,
+        status: this.isServiceConfigured('surveysparrow') ? 'unknown' : 'not_configured'
+      }
+    ];
+  }
+
+  public getCriticalServices(): ServiceConfig[] {
+    return this.getServiceConfigs().filter(service => service.isCritical);
+  }
+
+  public getOptionalServices(): ServiceConfig[] {
+    return this.getServiceConfigs().filter(service => !service.isCritical);
+  }
+
+  public hasAllCriticalServices(): boolean {
+    return this.getCriticalServices().every(service => service.isConfigured);
   }
 
   public isServiceConfigured(service: keyof Environment): boolean {

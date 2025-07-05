@@ -78,6 +78,14 @@ const EnhancedAdminTabsContent: React.FC<EnhancedAdminTabsContentProps> = ({
       case 'developer':
         return <IntegratedDeveloperTools />;
 
+      case 'services':
+        return (
+          <div className="space-y-6">
+            <ServiceConfigurationPanel />
+            <ServiceHealthMonitor />
+          </div>
+        );
+
       case 'activity':
         return <ActivityLog />;
 
