@@ -1,0 +1,24 @@
+{
+  "buildCommand": "npm run build",
+  "outputDirectory": "dist",
+  "devCommand": "npm run dev",
+  "installCommand": "npm install",
+  "functions": {
+    "api/realtime-voice-chat.js": {
+      "memory": 1024,
+      "maxDuration": 300
+    }
+  },
+  "routes": [
+    {
+      "src": "/api/realtime-voice-chat",
+      "dest": "/api/realtime-voice-chat.js",
+      "headers": {
+        "Access-Control-Allow-Origin": "*",
+        "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
+        "Access-Control-Allow-Headers": "Origin, X-Requested-With, Content-Type, Accept, Authorization, Cache-Control, Upgrade, Connection",
+        "Access-Control-Allow-Credentials": "true"
+      }
+    }
+  ]
+}

@@ -1,0 +1,31 @@
+// BACKUP OF ORIGINAL SUPABASE REALTIME VOICE CHAT FUNCTION
+// This file is disabled - the functionality has been moved to Vercel function at /api/realtime-voice-chat.js
+// Kept for reference and potential rollback if needed
+
+import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+import "https://deno.land/x/xhr@0.1.0/mod.ts";
+
+const corsHeaders = {
+  'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+};
+
+// This function is DISABLED - WebSocket functionality moved to Vercel
+console.log("⚠️ This Supabase function is DISABLED. WebSocket functionality moved to Vercel API route.");
+
+serve(async (req) => {
+  return new Response(
+    JSON.stringify({ 
+      error: "This function is disabled. WebSocket functionality moved to Vercel API route at /api/realtime-voice-chat",
+      redirect: "/api/realtime-voice-chat",
+      status: "disabled"
+    }), 
+    { 
+      status: 410, // Gone
+      headers: { 
+        ...corsHeaders, 
+        'Content-Type': 'application/json' 
+      } 
+    }
+  );
+}); 
