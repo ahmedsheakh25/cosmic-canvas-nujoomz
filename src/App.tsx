@@ -1,16 +1,14 @@
 import { Toaster } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route, Navigate, useLocation } from "react-router-dom";
-import { navItems } from "./nav-items";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import EnhancedNujmooz from "./pages/EnhancedNujmooz";
 import Landing from "./pages/Landing";
 import MobileNujmooz from "./pages/MobileNujmooz";
 import Admin from "./pages/Admin";
 import KnowledgeBase from "./pages/KnowledgeBase";
 import { SpeedInsightsWrapper } from '@/components/SpeedInsightsWrapper';
-import { getDomainRouteConfig, getCurrentHostname, shouldRedirectToDomainDefault } from '@/utils/domainRouting';
-import { useEffect } from 'react';
+import { getCurrentHostname } from '@/utils/domainRouting';
 
 const queryClient = new QueryClient();
 
@@ -26,7 +24,7 @@ const DomainRouter = () => {
       case 'orbit.ofspace.com':
         return <Navigate to="/admin" replace />;
       case 'nujmooz.ofspace.studio':
-        return <EnhancedNujmooz />;
+        return <Navigate to="/chat" replace />;
       case 'www.ofspace.studio':
       case 'ofspace.studio':
         return <Navigate to="/landing" replace />;
@@ -34,7 +32,7 @@ const DomainRouter = () => {
   }
   
   // Default behavior for development or unknown domains
-  return <EnhancedNujmooz />;
+  return <Navigate to="/chat" replace />;
 };
 
 const App = () => (
@@ -47,8 +45,9 @@ const App = () => (
           <Route path="/landing" element={<Landing />} />
           <Route path="/mobile-nujmooz" element={<MobileNujmooz />} />
           <Route path="/knowledge-base" element={<KnowledgeBase />} />
-          <Route path="/admin" element={<Admin />} />
+          <Route path="/admin/*" element={<Admin />} />
           <Route path="/chat" element={<EnhancedNujmooz />} />
+          <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
       </BrowserRouter>
       <SpeedInsightsWrapper 

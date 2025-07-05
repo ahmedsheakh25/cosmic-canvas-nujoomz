@@ -18,12 +18,12 @@ import { cn } from '@/lib/utils';
 
 const navigation = [
   { name: 'Dashboard', href: '/admin', icon: HomeIcon },
-  { name: 'Analytics', href: '#analytics', icon: ChartPieIcon },
-  { name: 'Conversations', href: '#conversations', icon: ChatBubbleLeftRightIcon },
-  { name: 'Team', href: '#team', icon: UsersIcon },
-  { name: 'Projects', href: '#projects', icon: FolderIcon },
-  { name: 'Reports', href: '#reports', icon: ChartBarIcon },
-  { name: 'Settings', href: '#settings', icon: Cog6ToothIcon },
+  { name: 'Analytics', href: '/admin/analytics', icon: ChartPieIcon },
+  { name: 'Conversations', href: '/admin/conversations', icon: ChatBubbleLeftRightIcon },
+  { name: 'Team', href: '/admin/team', icon: UsersIcon },
+  { name: 'Projects', href: '/admin/projects', icon: FolderIcon },
+  { name: 'Reports', href: '/admin/reports', icon: ChartBarIcon },
+  { name: 'Settings', href: '/admin/settings', icon: Cog6ToothIcon },
 ];
 
 interface DashboardShellProps {
@@ -92,34 +92,18 @@ export const DashboardShell: React.FC<DashboardShellProps> = ({ children }) => {
                         <ul role="list" className="-mx-2 space-y-1">
                           {navigation.map((item) => (
                             <li key={item.name}>
-                              {item.href.startsWith('#') ? (
-                                <button
-                                  onClick={(e) => {
-                                    e.preventDefault();
-                                    // Handle tab switching logic here if needed
-                                  }}
-                                  className={cn(
-                                    'text-gray-400 hover:text-white hover:bg-gray-800',
-                                    'group flex gap-x-3 rounded-md p-2 text-sm leading-6 font-semibold w-full text-left'
-                                  )}
-                                >
-                                  <item.icon className="h-6 w-6 shrink-0" aria-hidden="true" />
-                                  {item.name}
-                                </button>
-                              ) : (
-                                <Link
-                                  to={item.href}
-                                  className={cn(
-                                    location.pathname === item.href
-                                      ? 'bg-gray-800 text-white'
-                                      : 'text-gray-400 hover:text-white hover:bg-gray-800',
-                                    'group flex gap-x-3 rounded-md p-2 text-sm leading-6 font-semibold'
-                                  )}
-                                >
-                                  <item.icon className="h-6 w-6 shrink-0" aria-hidden="true" />
-                                  {item.name}
-                                </Link>
-                              )}
+                              <Link
+                                to={item.href}
+                                className={cn(
+                                  location.pathname === item.href
+                                    ? 'bg-gray-800 text-white'
+                                    : 'text-gray-400 hover:text-white hover:bg-gray-800',
+                                  'group flex gap-x-3 rounded-md p-2 text-sm leading-6 font-semibold'
+                                )}
+                              >
+                                <item.icon className="h-6 w-6 shrink-0" aria-hidden="true" />
+                                {item.name}
+                              </Link>
                             </li>
                           ))}
                         </ul>
@@ -149,34 +133,18 @@ export const DashboardShell: React.FC<DashboardShellProps> = ({ children }) => {
                 <ul role="list" className="-mx-2 space-y-1">
                   {navigation.map((item) => (
                     <li key={item.name}>
-                      {item.href.startsWith('#') ? (
-                        <button
-                          onClick={(e) => {
-                            e.preventDefault();
-                            // Handle tab switching logic here if needed
-                          }}
-                          className={cn(
-                            'text-gray-400 hover:text-white hover:bg-gray-800',
-                            'group flex gap-x-3 rounded-md p-2 text-sm leading-6 font-semibold w-full text-left'
-                          )}
-                        >
-                          <item.icon className="h-6 w-6 shrink-0" aria-hidden="true" />
-                          {item.name}
-                        </button>
-                      ) : (
-                        <Link
-                          to={item.href}
-                          className={cn(
-                            location.pathname === item.href
-                              ? 'bg-gray-800 text-white'
-                              : 'text-gray-400 hover:text-white hover:bg-gray-800',
-                            'group flex gap-x-3 rounded-md p-2 text-sm leading-6 font-semibold'
-                          )}
-                        >
-                          <item.icon className="h-6 w-6 shrink-0" aria-hidden="true" />
-                          {item.name}
-                        </Link>
-                      )}
+                      <Link
+                        to={item.href}
+                        className={cn(
+                          location.pathname === item.href
+                            ? 'bg-gray-800 text-white'
+                            : 'text-gray-400 hover:text-white hover:bg-gray-800',
+                          'group flex gap-x-3 rounded-md p-2 text-sm leading-6 font-semibold'
+                        )}
+                      >
+                        <item.icon className="h-6 w-6 shrink-0" aria-hidden="true" />
+                        {item.name}
+                      </Link>
                     </li>
                   ))}
                 </ul>
