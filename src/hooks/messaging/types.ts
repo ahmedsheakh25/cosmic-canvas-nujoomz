@@ -20,8 +20,9 @@ export interface MessageProcessorState {
 }
 
 export interface MessageResponse {
+  data?: any;
   response?: string;
   error?: {
     message: string;
   };
-} 
+}

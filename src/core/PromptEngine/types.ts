@@ -1,5 +1,5 @@
 import { ServiceKey } from '@/services_instructions';
-import { EmotionalState } from '../EmotionEngine/types';
+import { EmotionalState } from '../NujmoozEngine/types';
 import { ServiceMatch } from '../IntentEngine/types';
 import { Language } from '../NujmoozEngine/types';
 

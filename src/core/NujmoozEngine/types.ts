@@ -8,7 +8,7 @@ export interface NujmoozEngineConfig {
   emotionAnalysisEnabled: boolean;
   voiceEnabled: boolean;
   compatibilityMode: boolean;
-  supabaseClient: Database;
+  supabaseClient?: any;
 }
 
 export interface EmotionalState {
@@ -20,6 +20,7 @@ export interface EmotionalState {
     type: string;
     confidence: number;
   }>;
+  intensity?: number;
   metadata: Record<string, unknown>;
 }
 
@@ -52,6 +53,8 @@ export interface Message {
 
 export interface SessionContext {
   userId: string;
+  sessionId: string;
+  language: Language;
   startTime: number;
   schemaVersion: number;
   metadata?: Record<string, unknown>;

@@ -81,8 +81,9 @@ const EnhancedAdminTabsContent: React.FC<EnhancedAdminTabsContentProps> = ({
       case 'services':
         return (
           <div className="space-y-6">
-            <ServiceConfigurationPanel />
-            <ServiceHealthMonitor />
+            <div className="text-center text-muted-foreground">
+              Service management coming soon
+            </div>
           </div>
         );
 

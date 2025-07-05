@@ -55,6 +55,7 @@ export function useSession() {
 
   return {
     session,
+    sessionId: session.userId, // Backward compatibility
     updateSession,
     resetSession
   };

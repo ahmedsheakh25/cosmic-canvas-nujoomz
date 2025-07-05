@@ -22,7 +22,7 @@ export const VoiceChatInterface: React.FC<VoiceChatInterfaceProps> = ({
   const [audioContext, setAudioContext] = useState<AudioContext | null>(null);
   const [isInitializing, setIsInitializing] = useState(false);
 
-  const { isConnected, isConnecting, sendMessage } = useRealtimeConnection({
+  const { isConnected, connectionStatus, sendMessage } = useRealtimeConnection({
     sessionId,
     onMessage: (data) => {
       if (data.type === 'audio') {
