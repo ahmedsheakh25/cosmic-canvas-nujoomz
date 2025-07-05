@@ -5,9 +5,12 @@ import { SurveyInsightsCard } from '@/components/Admin/analytics/SurveyInsightsC
 import { ConversationFunnel } from '@/components/Admin/analytics/ConversationFunnel';
 import { EmotionTrendGraph } from '@/components/Admin/analytics/EmotionTrendGraph';
 import { AnalyticsEngine } from '@/core/NujmoozEngine/AnalyticsEngine';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { ElevenLabsTestPanel } from '@/components/Admin/ElevenLabsTestPanel';
+import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
+import ConversationsViewer from '@/components/Admin/ConversationsViewer';
 
 // Dashboard Overview Component
 function AdminDashboard() {
@@ -134,9 +137,7 @@ function ConversationsPage() {
   return (
     <div className="space-y-8">
       <h2 className="text-3xl font-bold tracking-tight">Conversations</h2>
-      <div className="grid gap-6">
-        {/* Add your conversations content here */}
-      </div>
+      <ConversationsViewer />
     </div>
   );
 }
@@ -147,7 +148,36 @@ function TeamPage() {
     <div className="space-y-8">
       <h2 className="text-3xl font-bold tracking-tight">Team Management</h2>
       <div className="grid gap-6">
-        {/* Add your team management content here */}
+        <Card>
+          <CardHeader>
+            <CardTitle>Team Members</CardTitle>
+            <CardDescription>Manage your team members and their roles</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-4">
+              <div className="flex items-center justify-between">
+                <div>
+                  <h3 className="text-lg font-medium">Active Members</h3>
+                  <p className="text-sm text-muted-foreground">Currently active team members</p>
+                </div>
+                <Button>Add Member</Button>
+              </div>
+              <div className="divide-y">
+                {/* Example team member */}
+                <div className="py-4 flex items-center justify-between">
+                  <div className="flex items-center space-x-4">
+                    <div className="w-10 h-10 rounded-full bg-gray-200" />
+                    <div>
+                      <p className="font-medium">John Doe</p>
+                      <p className="text-sm text-muted-foreground">Admin</p>
+                    </div>
+                  </div>
+                  <Button variant="outline">Manage</Button>
+                </div>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
       </div>
     </div>
   );
@@ -159,7 +189,40 @@ function ProjectsPage() {
     <div className="space-y-8">
       <h2 className="text-3xl font-bold tracking-tight">Projects</h2>
       <div className="grid gap-6">
-        {/* Add your projects content here */}
+        <Card>
+          <CardHeader>
+            <CardTitle>Active Projects</CardTitle>
+            <CardDescription>Overview of all ongoing projects</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-4">
+              <div className="flex items-center justify-between">
+                <div>
+                  <h3 className="text-lg font-medium">Current Projects</h3>
+                  <p className="text-sm text-muted-foreground">Projects in progress</p>
+                </div>
+                <Button>New Project</Button>
+              </div>
+              <div className="divide-y">
+                {/* Example project */}
+                <div className="py-4">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <h4 className="font-medium">Website Redesign</h4>
+                      <p className="text-sm text-muted-foreground">Due in 2 weeks</p>
+                    </div>
+                    <Badge>In Progress</Badge>
+                  </div>
+                  <div className="mt-2">
+                    <div className="w-full bg-gray-200 rounded-full h-2">
+                      <div className="bg-blue-600 h-2 rounded-full w-2/3"></div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
       </div>
     </div>
   );
@@ -171,7 +234,33 @@ function ReportsPage() {
     <div className="space-y-8">
       <h2 className="text-3xl font-bold tracking-tight">Reports</h2>
       <div className="grid gap-6">
-        {/* Add your reports content here */}
+        <Card>
+          <CardHeader>
+            <CardTitle>Analytics Reports</CardTitle>
+            <CardDescription>View and generate reports</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-4">
+              <div className="flex items-center justify-between">
+                <div>
+                  <h3 className="text-lg font-medium">Available Reports</h3>
+                  <p className="text-sm text-muted-foreground">Select a report to view</p>
+                </div>
+                <Button>Generate Report</Button>
+              </div>
+              <div className="divide-y">
+                {/* Example report */}
+                <div className="py-4 flex items-center justify-between">
+                  <div>
+                    <h4 className="font-medium">Monthly Usage Report</h4>
+                    <p className="text-sm text-muted-foreground">Last generated: 2 days ago</p>
+                  </div>
+                  <Button variant="outline">View</Button>
+                </div>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
       </div>
     </div>
   );
@@ -183,7 +272,35 @@ function SettingsPage() {
     <div className="space-y-8">
       <h2 className="text-3xl font-bold tracking-tight">Settings</h2>
       <div className="grid gap-6">
-        {/* Add your settings content here */}
+        <Card>
+          <CardHeader>
+            <CardTitle>General Settings</CardTitle>
+            <CardDescription>Manage your application settings</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-4">
+              <div>
+                <h3 className="text-lg font-medium">Application</h3>
+                <div className="mt-4 space-y-4">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="font-medium">Notifications</p>
+                      <p className="text-sm text-muted-foreground">Manage notification preferences</p>
+                    </div>
+                    <Button variant="outline">Configure</Button>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="font-medium">API Keys</p>
+                      <p className="text-sm text-muted-foreground">Manage API keys and tokens</p>
+                    </div>
+                    <Button variant="outline">Manage</Button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
       </div>
     </div>
   );

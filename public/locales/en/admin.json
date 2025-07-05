@@ -1,0 +1,108 @@
+{
+  "team": {
+    "title": "Team Management",
+    "description": "Manage team members and roles",
+    "invite": "Invite Member",
+    "invite_member": "Invite Team Member",
+    "invite_description": "Send an invitation to join your team. They will receive an email with instructions to accept.",
+    "email": "Email",
+    "role": "Role",
+    "select_role": "Select a role",
+    "send_invite": "Send Invitation",
+    "invite_sent": "Invitation sent successfully",
+    "pending_invite": "Pending Invitation",
+    "actions": "Member Actions",
+    "edit_roles": "Edit Roles",
+    "remove": "Remove Member"
+  },
+  "roles": {
+    "admin": "System Admin",
+    "manager": "Manager",
+    "editor": "Editor",
+    "viewer": "Viewer"
+  },
+  "projects": {
+    "title": "Projects",
+    "description": "Manage and track project progress",
+    "create": "Create Project",
+    "create_description": "Create a new project and assign team members",
+    "create_success": "Project created successfully",
+    "name": "Project Name",
+    "description_field": "Project Description",
+    "status": "Status",
+    "select_status": "Select a status",
+    "deadline": "Deadline",
+    "select_date": "Select a date",
+    "team": "Team Members",
+    "client": "Client",
+    "attachments": "Attachments",
+    "view_details": "View Details",
+    "status_options": {
+      "planned": "Planned",
+      "active": "Active",
+      "completed": "Completed"
+    }
+  },
+  "reports": {
+    "title": "Reports",
+    "description": "View and generate reports",
+    "usage_metrics": "Usage Metrics",
+    "sentiment_trends": "Sentiment Trends",
+    "project_health": "Project Health",
+    "team_activity": "Team Activity",
+    "export": "Export Report",
+    "schedule": "Schedule Report",
+    "frequency": {
+      "daily": "Daily",
+      "weekly": "Weekly",
+      "monthly": "Monthly"
+    },
+    "format": {
+      "pdf": "PDF",
+      "csv": "CSV",
+      "excel": "Excel"
+    }
+  },
+  "settings": {
+    "title": "Settings",
+    "description": "Configure system settings and preferences",
+    "organization": {
+      "title": "Organization",
+      "name": "Organization Name",
+      "logo": "Logo",
+      "language": "Default Language"
+    },
+    "features": {
+      "title": "Features",
+      "voice": "Voice Chat",
+      "analytics": "Analytics",
+      "color_gen": "Color Generation"
+    },
+    "notifications": {
+      "title": "Notifications",
+      "email": "Email Notifications",
+      "slack": "Slack Integration",
+      "webhook": "Webhook URL"
+    },
+    "backup": {
+      "title": "Backup & Restore",
+      "export": "Export Settings",
+      "import": "Import Settings",
+      "last_backup": "Last Backup"
+    }
+  },
+  "common": {
+    "save": "Save",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "edit": "Edit",
+    "create": "Create",
+    "update": "Update",
+    "loading": "Loading...",
+    "success": "Success",
+    "error": "Error",
+    "confirm": "Confirm",
+    "select": "Select...",
+    "actions": "Actions"
+  }
+} 

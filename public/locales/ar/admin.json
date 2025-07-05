@@ -1,0 +1,102 @@
+{
+  "team": {
+    "title": "إدارة الفريق",
+    "description": "إدارة أعضاء الفريق وأدوارهم",
+    "invite": "دعوة عضو",
+    "invite_member": "دعوة عضو للفريق",
+    "invite_description": "إرسال دعوة للانضمام إلى فريقك. سيتلقون بريدًا إلكترونيًا مع تعليمات القبول.",
+    "email": "البريد الإلكتروني",
+    "role": "الدور",
+    "select_role": "اختر دورًا",
+    "send_invite": "إرسال الدعوة",
+    "invite_sent": "تم إرسال الدعوة بنجاح",
+    "pending_invite": "دعوة معلقة",
+    "actions": "إجراءات العضو",
+    "edit_roles": "تعديل الأدوار",
+    "remove": "إزالة العضو"
+  },
+  "roles": {
+    "admin": "مدير النظام",
+    "manager": "مدير",
+    "editor": "محرر",
+    "viewer": "مشاهد"
+  },
+  "projects": {
+    "title": "المشاريع",
+    "description": "إدارة وتتبع تقدم المشروع",
+    "create": "إنشاء مشروع",
+    "name": "اسم المشروع",
+    "description_field": "وصف المشروع",
+    "status": "الحالة",
+    "deadline": "الموعد النهائي",
+    "team": "أعضاء الفريق",
+    "client": "العميل",
+    "attachments": "المرفقات",
+    "status_options": {
+      "planned": "مخطط",
+      "active": "نشط",
+      "completed": "مكتمل"
+    }
+  },
+  "reports": {
+    "title": "التقارير",
+    "description": "عرض وإنشاء التقارير",
+    "usage_metrics": "مقاييس الاستخدام",
+    "sentiment_trends": "اتجاهات المشاعر",
+    "project_health": "صحة المشروع",
+    "team_activity": "نشاط الفريق",
+    "export": "تصدير التقرير",
+    "schedule": "جدولة التقرير",
+    "frequency": {
+      "daily": "يومي",
+      "weekly": "أسبوعي",
+      "monthly": "شهري"
+    },
+    "format": {
+      "pdf": "PDF",
+      "csv": "CSV",
+      "excel": "Excel"
+    }
+  },
+  "settings": {
+    "title": "الإعدادات",
+    "description": "تكوين إعدادات وتفضيلات النظام",
+    "organization": {
+      "title": "المؤسسة",
+      "name": "اسم المؤسسة",
+      "logo": "الشعار",
+      "language": "اللغة الافتراضية"
+    },
+    "features": {
+      "title": "الميزات",
+      "voice": "الدردشة الصوتية",
+      "analytics": "التحليلات",
+      "color_gen": "توليد الألوان"
+    },
+    "notifications": {
+      "title": "الإشعارات",
+      "email": "إشعارات البريد الإلكتروني",
+      "slack": "تكامل Slack",
+      "webhook": "رابط Webhook"
+    },
+    "backup": {
+      "title": "النسخ الاحتياطي والاستعادة",
+      "export": "تصدير الإعدادات",
+      "import": "استيراد الإعدادات",
+      "last_backup": "آخر نسخة احتياطية"
+    }
+  },
+  "common": {
+    "save": "حفظ",
+    "cancel": "إلغاء",
+    "delete": "حذف",
+    "edit": "تعديل",
+    "create": "إنشاء",
+    "update": "تحديث",
+    "loading": "جاري التحميل...",
+    "success": "نجاح",
+    "error": "خطأ",
+    "confirm": "تأكيد",
+    "select": "اختر..."
+  }
+} 

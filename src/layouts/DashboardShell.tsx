@@ -28,9 +28,15 @@ const navigation = [
 
 interface DashboardShellProps {
   children: React.ReactNode;
+  title: string;
+  description: string;
 }
 
-export const DashboardShell: React.FC<DashboardShellProps> = ({ children }) => {
+export function DashboardShell({
+  children,
+  title,
+  description,
+}: DashboardShellProps) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const location = useLocation();
 
@@ -212,9 +218,17 @@ export const DashboardShell: React.FC<DashboardShellProps> = ({ children }) => {
         </div>
 
         <main className="py-10">
-          <div className="px-4 sm:px-6 lg:px-8">{children}</div>
+          <div className="px-4 sm:px-6 lg:px-8">
+            <div className="flex items-center justify-between space-y-2">
+              <div>
+                <h2 className="text-3xl font-bold tracking-tight">{title}</h2>
+                <p className="text-muted-foreground">{description}</p>
+              </div>
+            </div>
+            <div>{children}</div>
+          </div>
         </main>
       </div>
     </div>
   );
-}; 
+} 

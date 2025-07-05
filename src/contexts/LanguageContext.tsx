@@ -1,14 +1,23 @@
-
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 
 type Language = 'ar' | 'en';
 type Direction = 'rtl' | 'ltr';
 
+interface Translations {
+  [language: string]: {
+    [namespace: string]: {
+      [key: string]: any;
+    };
+  };
+}
+
 interface LanguageContextType {
   language: Language;
   direction: Direction;
   toggleLanguage: () => void;
-  t: (key: string) => string;
+  t: (namespace: string, key: string) => string;
+  translations: Translations;
+  setTranslations: (translations: Translations) => void;
 }
 
 const translations = {
@@ -122,7 +131,14 @@ const translations = {
   }
 };
 
-const LanguageContext = createContext<LanguageContextType | null>(null);
+export const LanguageContext = createContext<LanguageContextType>({
+  language: 'en',
+  direction: 'ltr',
+  toggleLanguage: () => {},
+  t: (namespace: string, key: string) => key,
+  translations: {},
+  setTranslations: () => {},
+});
 
 export const useLanguage = () => {
   const context = useContext(LanguageContext);
@@ -136,22 +152,31 @@ interface LanguageProviderProps {
   children: ReactNode;
 }
 
-export const LanguageProvider: React.FC<LanguageProviderProps> = ({ children }) => {
-  const [language, setLanguage] = useState<Language>(() => {
-    const saved = localStorage.getItem('admin-language');
-    return (saved as Language) || 'en';
-  });
+export function LanguageProvider({ children }: LanguageProviderProps) {
+  const [language, setLanguage] = useState<Language>('en');
+  const [translations, setTranslations] = useState<Translations>({});
 
   const direction: Direction = language === 'ar' ? 'rtl' : 'ltr';
 
   const toggleLanguage = () => {
     const newLanguage = language === 'ar' ? 'en' : 'ar';
     setLanguage(newLanguage);
-    localStorage.setItem('admin-language', newLanguage);
   };
 
-  const t = (key: string): string => {
-    return translations[language][key as keyof typeof translations[typeof language]] || key;
+  const t = (namespace: string, key: string): string => {
+    const keys = key.split('.');
+    let value = translations[language]?.[namespace];
+
+    for (const k of keys) {
+      if (value && typeof value === 'object' && k in value) {
+        value = value[k];
+      } else {
+        console.warn(`Translation key not found: ${namespace}.${key}`);
+        return key;
+      }
+    }
+
+    return typeof value === 'string' ? value : key;
   };
 
   useEffect(() => {
@@ -159,11 +184,38 @@ export const LanguageProvider: React.FC<LanguageProviderProps> = ({ children }) 
     document.documentElement.setAttribute('lang', language);
   }, [language, direction]);
 
+  useEffect(() => {
+    // Load translations
+    const loadTranslations = async () => {
+      try {
+        const [enAdmin, arAdmin] = await Promise.all([
+          fetch('/locales/en/admin.json').then(res => res.json()),
+          fetch('/locales/ar/admin.json').then(res => res.json()),
+        ]);
+
+        setTranslations({
+          en: {
+            admin: enAdmin,
+          },
+          ar: {
+            admin: arAdmin,
+          },
+        });
+      } catch (error) {
+        console.error('Failed to load translations:', error);
+      }
+    };
+
+    loadTranslations();
+  }, []);
+
   const value: LanguageContextType = {
     language,
     direction,
     toggleLanguage,
-    t
+    t,
+    translations,
+    setTranslations,
   };
 
   return (
@@ -171,4 +223,4 @@ export const LanguageProvider: React.FC<LanguageProviderProps> = ({ children }) 
       {children}
     </LanguageContext.Provider>
   );
-};
+}
