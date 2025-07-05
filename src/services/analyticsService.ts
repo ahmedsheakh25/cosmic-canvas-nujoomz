@@ -228,7 +228,7 @@ export class AnalyticsService {
           case 'message_received':
             analytics.messageCount++;
             
-            if (event.metadata.isVoice) {
+            if ((event.metadata as any)?.isVoice) {
               analytics.voiceUsage++;
             }
 
@@ -244,12 +244,14 @@ export class AnalyticsService {
             break;
 
           case 'emotion_detected':
-            const emotion = event.metadata.primaryEmotion.type;
-            analytics.emotionalStates[emotion] = (analytics.emotionalStates[emotion] || 0) + 1;
+            const emotion = (event.metadata as any)?.primaryEmotion?.type;
+            if (emotion) {
+              analytics.emotionalStates[emotion] = (analytics.emotionalStates[emotion] || 0) + 1;
+            }
             break;
 
           case 'service_detected':
-            event.metadata.detectedServices.forEach((service: any) => {
+            ((event.metadata as any)?.detectedServices || []).forEach((service: any) => {
               const serviceKey = service.serviceKey;
               analytics.detectedServices[serviceKey] = (analytics.detectedServices[serviceKey] || 0) + 1;
             });

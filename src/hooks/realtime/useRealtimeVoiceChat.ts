@@ -15,9 +15,14 @@ export const useRealtimeVoiceChat = (sessionId: string) => {
     messages,
     connect,
     disconnect,
-    sendMessage,
-    cleanup: cleanupConnection
-  } = useRealtimeConnection(sessionId);
+    sendMessage
+  } = useRealtimeConnection({
+    sessionId,
+    onMessage: () => {},
+    onConnected: () => {},
+    onDisconnected: () => {},
+    onError: () => {}
+  });
 
   const {
     isRecording,
@@ -135,9 +140,9 @@ export const useRealtimeVoiceChat = (sessionId: string) => {
   const cleanup = useCallback(() => {
     console.log("Cleaning up voice chat...");
     cleanupAudio();
-    cleanupConnection();
+    disconnect();
     setOverallError(null);
-  }, [cleanupAudio, cleanupConnection]);
+  }, [cleanupAudio, disconnect]);
 
   useEffect(() => {
     return () => {

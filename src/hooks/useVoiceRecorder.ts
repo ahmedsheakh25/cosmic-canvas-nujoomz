@@ -48,7 +48,7 @@ export function useVoiceRecorder({
       };
 
       recorder.onerror = (e) => {
-        handleError(new Error('MediaRecorder error: ' + e.error.message));
+        handleError(new Error('MediaRecorder error: ' + (e as any).error?.message || 'Unknown error'));
       };
 
       setMediaRecorder(recorder);

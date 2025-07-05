@@ -65,16 +65,16 @@ export const useNujmoozInterface = () => {
           title: `${file.title} - نسخة`,
           createdAt: new Date()
         };
-        fileState.setGeneratedFiles(prev => [...prev, duplicatedFile]);
+        fileState.setGeneratedFiles([...fileState.generatedFiles, duplicatedFile]);
         break;
       case 'delete':
         if (window.confirm(`هل أنت متأكد من حذف الملف: ${file.title}؟`)) {
-          fileState.setGeneratedFiles(prev => prev.filter(f => f.id !== fileId));
+          fileState.setGeneratedFiles(fileState.generatedFiles.filter(f => f.id !== fileId));
         }
         break;
       case 'favorite':
-        fileState.setGeneratedFiles(prev => 
-          prev.map(f => f.id === fileId ? { ...f, isFavorite: !f.isFavorite } : f)
+        fileState.setGeneratedFiles(
+          fileState.generatedFiles.map(f => f.id === fileId ? { ...f, isFavorite: !f.isFavorite } : f)
         );
         break;
     }

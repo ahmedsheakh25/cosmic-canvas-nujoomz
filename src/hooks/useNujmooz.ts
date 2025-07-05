@@ -34,11 +34,7 @@ export function useNujmooz(options: UseNujmoozOptions = {}) {
   });
 
   const { session, updateSession } = useSession();
-  const [engine] = useState(() => new NujmoozEngine({
-    defaultLanguage: options.defaultLanguage || 'ar',
-    enableVoice: options.enableVoice ?? true,
-    enableEmotions: options.enableEmotions ?? true
-  }));
+  const [engine] = useState(() => new NujmoozEngine());
 
   const processInput = useCallback(async (input: UserInput) => {
     setState(prev => ({ ...prev, isProcessing: true, error: null }));
@@ -46,6 +42,8 @@ export function useNujmooz(options: UseNujmoozOptions = {}) {
     try {
       const context: SessionContext = {
         userId: session.userId,
+        sessionId: session.userId,
+        language: input.language || 'ar',
         startTime: Date.now(),
         schemaVersion: 2,
         previousAnswers: session.answers,
@@ -53,33 +51,40 @@ export function useNujmooz(options: UseNujmoozOptions = {}) {
         metadata: session.metadata
       };
 
-      const result = await engine.processInput(input, context);
+      const prompt = await engine.processInput(input.content);
 
       // Update session with new data
       updateSession({
         history: [
           ...session.history,
           { role: 'user', content: input.content },
-          { role: 'assistant', content: result.prompt }
+          { role: 'assistant', content: prompt }
         ],
-        emotionalState: result.emotionalState,
-        serviceContext: result.serviceContext,
         metadata: {
           ...session.metadata,
-          lastProcessingTime: result.metadata.processingTime,
-          language: result.metadata.language
+          language: input.language || 'ar'
         }
       });
 
       setState(prev => ({
         ...prev,
         isProcessing: false,
-        currentPrompt: result.prompt,
-        emotionalState: result.emotionalState,
-        serviceContext: result.serviceContext
+        currentPrompt: prompt,
+        emotionalState: null,
+        serviceContext: null
       }));
 
-      return result;
+      return {
+        prompt,
+        emotionalState: null,
+        serviceContext: { detectedServices: [], confidence: 0, metadata: {} },
+        nextQuestion: null,
+        metadata: {
+          timestamp: new Date(),
+          processingTime: Date.now() - context.startTime,
+          language: input.language || 'ar'
+        }
+      };
     } catch (error) {
       setState(prev => ({
         ...prev,

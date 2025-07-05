@@ -25,7 +25,7 @@ export const useRealtimeAudio = (sendMessage: (message: any) => boolean) => {
       
       // Create audio context with optimal settings
       audioContextRef.current = new AudioContext({
-        sampleRate: REALTIME_CONFIG.AUDIO.SAMPLE_RATE
+        sampleRate: REALTIME_CONFIG.AUDIO.DEFAULT_SAMPLE_RATE
       });
 
       // Resume if suspended (required by some browsers)
