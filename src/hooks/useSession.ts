@@ -22,13 +22,24 @@ interface SessionUpdate {
 }
 
 export function useSession() {
-  const [session, setSession] = useState<Session>({
-    userId: crypto.randomUUID(),
-    history: [],
-    answers: {},
-    emotionalState: null,
-    serviceContext: null,
-    metadata: {}
+  const [session, setSession] = useState<Session>(() => {
+    // Try to get existing session ID from localStorage
+    const storedSessionId = localStorage.getItem('nujmooz_session_id');
+    const sessionId = storedSessionId && isValidUUID(storedSessionId) 
+      ? storedSessionId 
+      : crypto.randomUUID();
+    
+    // Store the session ID for persistence
+    localStorage.setItem('nujmooz_session_id', sessionId);
+    
+    return {
+      userId: sessionId,
+      history: [],
+      answers: {},
+      emotionalState: null,
+      serviceContext: null,
+      metadata: {}
+    };
   });
 
   const updateSession = useCallback((update: SessionUpdate) => {
@@ -43,8 +54,11 @@ export function useSession() {
   }, []);
 
   const resetSession = useCallback(() => {
+    const newSessionId = crypto.randomUUID();
+    localStorage.setItem('nujmooz_session_id', newSessionId);
+    
     setSession({
-      userId: crypto.randomUUID(),
+      userId: newSessionId,
       history: [],
       answers: {},
       emotionalState: null,
@@ -60,3 +74,9 @@ export function useSession() {
     resetSession
   };
 }
+
+// Helper function to validate UUID format
+const isValidUUID = (uuid: string): boolean => {
+  const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+  return uuidRegex.test(uuid);
+};

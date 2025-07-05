@@ -4,6 +4,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { saveChatMessage, type ChatMessage } from '@/utils/sessionManager';
 import { detectLanguageFromMessage } from '@/lib/nujmoozInstructions';
 import { generateBriefPDF } from '@/utils/pdfGenerator';
+import { callChatApi } from '@/utils/chatApiUtils';
 
 export const useMessageSender = (
   sessionId: string,
@@ -42,27 +43,14 @@ export const useMessageSender = (
   };
 
   const sendToAPI = async (finalMessage: string, effectiveLanguage: 'en' | 'ar') => {
-    try {
-      const { data, error } = await supabase.functions.invoke('chat-with-nujmooz', {
-        body: {
-          message: finalMessage,
-          sessionId: sessionId,
-          language: effectiveLanguage,
-          conversationHistory: messages.slice(-5)
-        }
-      });
+    const result = await callChatApi({
+      message: finalMessage,
+      sessionId: sessionId,
+      language: effectiveLanguage,
+      context: messages.slice(-5).map(m => `${m.sender}: ${m.message}`).join('\n')
+    });
 
-      if (error) throw new Error(error.message);
-      
-      return data?.response || (effectiveLanguage === 'ar' 
-        ? 'أهلًا وسهلًا! ما فهمت عليك تماماً 🤔 ممكن توضحلي أكثر عن الفكرة الإبداعية اللي في بالك؟ يلا نشوف! ✨'
-        : 'Hello there! I didn\'t quite catch that 🤔 Could you tell me more about the amazing creative idea you have in mind? Let\'s explore it together! ✨');
-    } catch (error) {
-      console.error('API Error:', error);
-      return effectiveLanguage === 'ar'
-        ? "أهلًا! صار خلل بسيط في الاتصال 👨‍💻 يلا نجرب مرة ثانية خلال دقايق! أو أرسل لي فكرتك والفريق بيتواصل معك مباشرة! ما نشيل هم 🚀"
-        : "Hello! Connection hiccup 👨‍💻 Let's try again in a few minutes! Or send me your idea and our team will reach out directly! No worries at all 🚀";
-    }
+    return result.response || '';
   };
 
   const processWorkflow = async (briefData: any, effectiveLanguage: 'en' | 'ar') => {

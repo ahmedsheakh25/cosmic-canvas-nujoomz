@@ -4,6 +4,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { saveChatMessage, type ChatMessage } from '@/utils/sessionManager';
 import { type ConversationMemory } from '../useConversationMemory';
 import { type IntentContext } from '../intent/intentTypes';
+import { callChatApi } from '@/utils/chatApiUtils';
 
 export const useAdvancedMessageProcessor = (
   sessionId: string,
@@ -19,26 +20,23 @@ export const useAdvancedMessageProcessor = (
     intentContext: IntentContext,
     memory: ConversationMemory
   ) => {
-    try {
-      const { data, error } = await supabase.functions.invoke('chat-with-nujmooz', {
-        body: {
-          message: finalMessage,
-          sessionId: sessionId,
-          language: effectiveLanguage,
-          conversationHistory: messages.slice(-5),
-          intentContext: intentContext,
-          userPreferences: memory.userPreferences,
-          projectContext: memory.projectContext
-        }
-      });
+    const result = await callChatApi({
+      message: finalMessage,
+      sessionId: sessionId,
+      language: effectiveLanguage,
+      context: messages.slice(-5).map(m => `${m.sender}: ${m.message}`).join('\n'),
+      currentBrief: {
+        intentContext: intentContext,
+        userPreferences: memory.userPreferences,
+        projectContext: memory.projectContext
+      }
+    });
 
-      if (error) throw new Error(error.message);
-      
-      return data?.response || getDefaultResponse(effectiveLanguage, intentContext);
-    } catch (error) {
-      console.error('Enhanced API Error:', error);
-      throw error;
+    if (!result.success) {
+      throw new Error(result.error || 'Failed to process enhanced chat');
     }
+    
+    return result.response || getDefaultResponse(effectiveLanguage, intentContext);
   };
 
   const processEnhancedWorkflow = async (
