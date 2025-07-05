@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent } from '@/components/ui/dialog';
 import { EnhancedAssistantsManager } from './components/EnhancedAssistantsManager';
 import { PromptsLibrary } from './components/PromptsLibrary';
+import ElevenLabsTestPanel from './ElevenLabsTestPanel';
 import { AnimatedPage, StaggerContainer, StaggerItem } from './animations/AdminAnimations';
 import { DeveloperToolCard } from './components/DeveloperToolCard';
 import { SystemStatusDashboard } from './components/SystemStatusDashboard';
@@ -49,6 +50,8 @@ const IntegratedDeveloperTools: React.FC<IntegratedDeveloperToolsProps> = ({ cla
     setPromptsLibraryOpen
   } = useAssistantsManager();
 
+  const [elevenLabsTestOpen, setElevenLabsTestOpen] = React.useState(false);
+
   const tools: DeveloperTool[] = [
     {
       id: 'api-test',
@@ -59,6 +62,16 @@ const IntegratedDeveloperTools: React.FC<IntegratedDeveloperToolsProps> = ({ cla
       status: 'active',
       category: 'Testing',
       features: ['13 Edge Functions', 'Real-time Testing', 'Response Validation', 'Arabic Support']
+    },
+    {
+      id: 'elevenlabs-test',
+      title: '🎤 ElevenLabs Voice Test',
+      description: 'Test ElevenLabs text-to-speech integration and voice synthesis',
+      icon: () => <span className="text-lg">🎤</span>,
+      action: () => setElevenLabsTestOpen(true),
+      status: 'active',
+      category: 'Voice AI',
+      features: ['Text-to-Speech', 'Voice Selection', 'Arabic Support', 'Audio Quality Test']
     },
     {
       id: 'models',
@@ -268,6 +281,13 @@ const IntegratedDeveloperTools: React.FC<IntegratedDeveloperToolsProps> = ({ cla
       <Dialog open={promptsLibraryOpen} onOpenChange={setPromptsLibraryOpen}>
         <DialogContent className="max-w-7xl max-h-[90vh] overflow-y-auto p-6">
           <PromptsLibrary />
+        </DialogContent>
+      </Dialog>
+
+      {/* ElevenLabs Test Panel Modal */}
+      <Dialog open={elevenLabsTestOpen} onOpenChange={setElevenLabsTestOpen}>
+        <DialogContent className="max-w-2xl">
+          <ElevenLabsTestPanel />
         </DialogContent>
       </Dialog>
     </>

@@ -3,6 +3,7 @@ interface TextToSpeechOptions {
   stability?: number;
   similarityBoost?: number;
   speakerBoost?: boolean;
+  voiceId?: string;
 }
 
 class ElevenLabsClient {
@@ -35,71 +36,77 @@ class ElevenLabsClient {
   }
 
   public isConfigured(): boolean {
-    return !!(this.apiKey && this.voiceId);
+    // Since we're using Edge Functions, we'll assume it's configured
+    // and let the Edge Function handle the actual validation
+    return true;
   }
 
   public async textToSpeech(
     text: string,
     options: TextToSpeechOptions = {}
   ): Promise<Blob | null> {
-    if (!this.isConfigured()) {
-      console.error('ElevenLabs client is not properly configured');
-      return null;
-    }
-
     try {
-      const response = await fetch(
-        `${this.baseUrl}/text-to-speech/${this.voiceId}`,
-        {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'xi-api-key': this.apiKey!,
-          },
-          body: JSON.stringify({
-            text,
-            model_id: options.modelId || 'eleven_multilingual_v2',
-            voice_settings: {
-              stability: options.stability || 0.5,
-              similarity_boost: options.similarityBoost || 0.75,
-              speaker_boost: options.speakerBoost || true,
-            },
-          }),
+      console.log('🎤 Requesting text-to-speech for:', text.substring(0, 50) + '...');
+      
+      // Use secure Edge Function instead of direct API call
+      const { supabase } = await import('@/integrations/supabase/client');
+      
+      const { data, error } = await supabase.functions.invoke('text-to-speech', {
+        body: {
+          text,
+          voice: options.voiceId || this.voiceId,
+          modelId: options.modelId || 'eleven_multilingual_v2',
+          stability: options.stability ?? 0.5,
+          similarityBoost: options.similarityBoost ?? 0.75,
+          speakerBoost: options.speakerBoost ?? true,
         }
-      );
+      });
 
-      if (!response.ok) {
-        throw new Error(`ElevenLabs API error: ${response.status}`);
+      if (error) {
+        console.error('❌ Edge Function error:', error);
+        throw new Error(`Text-to-speech failed: ${error.message}`);
       }
 
-      return await response.blob();
+      if (!data?.success || !data?.audioContent) {
+        console.error('❌ Invalid response from text-to-speech service:', data);
+        throw new Error(data?.error || 'Invalid response from text-to-speech service');
+      }
+
+      // Convert base64 back to blob
+      const binaryString = atob(data.audioContent);
+      const bytes = new Uint8Array(binaryString.length);
+      for (let i = 0; i < binaryString.length; i++) {
+        bytes[i] = binaryString.charCodeAt(i);
+      }
+
+      console.log('✅ Successfully generated audio blob:', bytes.length, 'bytes');
+      return new Blob([bytes], { type: 'audio/mpeg' });
+
     } catch (error) {
-      console.error('Error in text-to-speech conversion:', error);
+      console.error('❌ Error in text-to-speech conversion:', error);
+      
+      // Graceful degradation - return null so calling code can handle fallback
       return null;
     }
   }
 
   public async getVoices(): Promise<any[] | null> {
-    if (!this.apiKey) {
-      console.error('ElevenLabs API key not configured');
-      return null;
-    }
-
     try {
-      const response = await fetch(`${this.baseUrl}/voices`, {
-        headers: {
-          'xi-api-key': this.apiKey,
-        },
-      });
+      console.log('🎤 Fetching available voices...');
+      
+      // Use secure Edge Function for voice listing
+      const { supabase } = await import('@/integrations/supabase/client');
+      
+      const { data, error } = await supabase.functions.invoke('get-elevenlabs-voices');
 
-      if (!response.ok) {
-        throw new Error(`ElevenLabs API error: ${response.status}`);
+      if (error) {
+        console.error('❌ Error fetching voices:', error);
+        return null;
       }
 
-      const data = await response.json();
-      return data.voices;
+      return data?.voices || null;
     } catch (error) {
-      console.error('Error fetching voices:', error);
+      console.error('❌ Error fetching voices:', error);
       return null;
     }
   }

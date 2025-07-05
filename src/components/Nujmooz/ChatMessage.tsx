@@ -1,6 +1,7 @@
 
 import React from 'react';
 import { motion } from 'framer-motion';
+import EnhancedVoiceSynthesis from './EnhancedVoiceSynthesis';
 
 interface ChatMessageProps {
   message: {
@@ -38,7 +39,19 @@ const ChatMessage: React.FC<ChatMessageProps> = ({ message, currentLanguage, ind
           } shadow-lg`}
           dir={currentLanguage === 'ar' ? 'rtl' : 'ltr'}
         >
-          <p className="whitespace-pre-wrap leading-relaxed">{message.message}</p>
+          <div className="flex items-start justify-between gap-2">
+            <p className="whitespace-pre-wrap leading-relaxed flex-1">{message.message}</p>
+            
+            {/* Voice synthesis button for Nujmooz messages */}
+            {message.sender === 'nujmooz' && (
+              <EnhancedVoiceSynthesis
+                text={message.message}
+                language={currentLanguage as 'ar' | 'en'}
+                className="flex-shrink-0 ml-2"
+              />
+            )}
+          </div>
+          
           <div className={`text-xs mt-2 ${
             message.sender === 'user' ? 'text-black/60' : 'text-white/50'
           }`}>
