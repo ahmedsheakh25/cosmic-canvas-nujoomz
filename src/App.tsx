@@ -14,27 +14,14 @@ import { useEffect } from 'react';
 
 const queryClient = new QueryClient();
 
-// Domain-aware routing component
+// Domain-aware routing component for root path only
 const DomainRouter = () => {
-  const location = useLocation();
   const hostname = getCurrentHostname();
-  const domainConfig = getDomainRouteConfig(hostname);
-
-  useEffect(() => {
-    console.log('Current hostname:', hostname);
-    console.log('Domain config:', domainConfig);
-    console.log('Current path:', location.pathname);
-  }, [hostname, domainConfig, location.pathname]);
-
-  // Handle domain-specific redirects
-  if (shouldRedirectToDomainDefault(hostname, location.pathname)) {
-    const defaultRoute = domainConfig?.defaultRoute || '/';
-    console.log('Redirecting to:', defaultRoute);
-    return <Navigate to={defaultRoute} replace />;
-  }
-
-  // Special handling for root path based on domain
-  if (location.pathname === '/') {
+  
+  // Only apply domain routing in production environments
+  const isProduction = hostname.includes('ofspace.com') || hostname.includes('ofspace.studio');
+  
+  if (isProduction) {
     switch (hostname) {
       case 'orbit.ofspace.com':
         return <Navigate to="/admin" replace />;
@@ -43,12 +30,11 @@ const DomainRouter = () => {
       case 'www.ofspace.studio':
       case 'ofspace.studio':
         return <Navigate to="/landing" replace />;
-      default:
-        return <EnhancedNujmooz />;
     }
   }
-
-  return null;
+  
+  // Default behavior for development or unknown domains
+  return <EnhancedNujmooz />;
 };
 
 const App = () => (
