@@ -36,7 +36,7 @@ export class PromptManager {
         serviceMatches,
         emotionalState: context.emotionalState,
         language: context.input.language || this.config.defaultLanguage,
-        userPreferences: context.context.metadata?.userPreferences,
+        userPreferences: (context.context.metadata?.userPreferences as Record<string, unknown>) || {},
         conversationHistory: context.context.conversationHistory
       };
 

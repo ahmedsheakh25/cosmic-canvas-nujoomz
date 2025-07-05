@@ -45,16 +45,17 @@ export class CompatibilityLayer {
       messageId: legacyResponse.id || Date.now().toString(),
       content: legacyResponse.content,
       emotionalState: {
-        primaryEmotion: 'neutral',
-        confidence: 1,
+        primaryEmotion: {
+          type: 'neutral',
+          confidence: 1
+        },
         secondaryEmotions: [],
-        context: {}
+        metadata: {}
       },
       serviceContext: {
         detectedServices: [],
-        buyingIntent: 0,
-        userPreferences: {},
-        previousInteractions: []
+        confidence: 0,
+        metadata: {}
       },
       metadata: {
         isLegacy: true,

@@ -5,7 +5,7 @@ import { analyzeContent } from '@/utils/analysis/contentAnalysis';
 import { createFile } from '@/utils/files/fileGenerators';
 
 export const useModernNujmoozState = () => {
-  const [generatedFiles, setGeneratedFiles] = useState<GeneratedFile[]>([]);
+  const [generatedFiles, setGeneratedFilesState] = useState<GeneratedFile[]>([]);
   const [isProcessingFiles, setIsProcessingFiles] = useState(false);
 
   const processMessageForFiles = async (message: ChatMessage): Promise<FileProcessingResult> => {
@@ -40,7 +40,7 @@ export const useModernNujmoozState = () => {
       }
 
       if (newFiles.length > 0) {
-        setGeneratedFiles(prev => [...prev, ...newFiles]);
+        setGeneratedFilesState(prev => [...prev, ...newFiles]);
       }
 
       return { success: true, files: newFiles };
@@ -56,9 +56,14 @@ export const useModernNujmoozState = () => {
     }
   };
 
+  const setGeneratedFiles = (files: GeneratedFile[]) => {
+    setGeneratedFilesState(files);
+  };
+
   return {
     generatedFiles,
     isProcessingFiles,
-    processMessageForFiles
+    processMessageForFiles,
+    setGeneratedFiles
   };
 };

@@ -32,8 +32,9 @@ export const EmotionTrendGraph = () => {
       setLoading(true);
 
       const { data, error: dbError } = await supabase
-        .from('emotional_analytics')
+        .from('analytics_events')
         .select('*')
+        .eq('feature', 'emotion')
         .order('created_at', { ascending: true });
 
       if (dbError) throw dbError;
