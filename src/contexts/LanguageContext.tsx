@@ -14,7 +14,7 @@ interface LanguageContextType {
 const translations = {
   ar: {
     // Navigation
-    'nav.dashboard': 'لوحة التحكم',
+    'nav.dashboard': 'لوحة التتحكم',
     'nav.projects': 'المشاريع',
     'nav.analytics': 'التحليلات',
     'nav.team': 'الفريق',
